@@ -81,7 +81,6 @@ public class test extends JFrame {
                 break;
 
             default:
-                // 숫자, 연산자 및 소수점 추가
                 result.setText(result.getText() + buttonText);
                 break;
         }
