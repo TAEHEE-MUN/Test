@@ -76,7 +76,7 @@ public class test extends JFrame {
             b[i].addActionListener(e -> handleButtonClick(buttonText)); // 버튼 클릭 시 이벤트 처리
             b[i].setBackground(color);
         }
-            // 숫자 버튼 색상 설정
+        // 숫자 버튼 색상 설정
         for (int i = 8; i < 20; i++) {
             if (i % 4 != 3) {
                 b[i].setForeground(color2);
@@ -148,8 +148,8 @@ public class test extends JFrame {
                 // 제곱근 계산
                 if (!currentText.isEmpty()) {
                     double sqrtValue = Math.sqrt(Double.parseDouble(currentText)); // 제곱근 계산
-                    result_show.setText(String.valueOf(sqrtValue));
-                    result_process.setText(result_process.getText() + "√" + currentText);
+                    result_show.setText("");
+                    result_process.setText(result_process.getText() + sqrtValue);
                     result.setText("");
                 }
                 break;
@@ -164,6 +164,9 @@ public class test extends JFrame {
                     result_process.setText(result_process.getText() + currentText + buttonText);
                     result_show.setText(String.valueOf(resultValue2));
                     result.setText("");
+                    if (isOperator("%")) {
+                        result_show.setText("");
+                    }
                 } else {
                     result.setText(currentText + buttonText); // 숫자 입력
                 }
