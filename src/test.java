@@ -13,6 +13,7 @@ public class test extends JFrame {
         this.setSize(300, 400);
         this.setLayout(new BorderLayout());
 
+
         // 패널 및 텍스트 필드 설정
         JPanel p1 = new JPanel();
         result_show = new JTextField("");
@@ -25,6 +26,8 @@ public class test extends JFrame {
         result_show.setFont(new Font("Arial", Font.PLAIN, 25));
         result_process.setFont(new Font("Arial", Font.PLAIN, 20));
         result.setFont(new Font("Arial", Font.PLAIN, 45));
+
+
 
         result_show.setHorizontalAlignment(JTextField.RIGHT);
         result_process.setHorizontalAlignment(JTextField.RIGHT);
@@ -39,6 +42,8 @@ public class test extends JFrame {
         JPanel p2 = new JPanel();
         p2.setLayout(new GridLayout(6, 4, 2, 2));
 
+
+
         String[] buttons = {
                 "%", "CE", "C", "←",
                 "1/x", "x²", "√x", "/",
@@ -50,18 +55,31 @@ public class test extends JFrame {
 
         JButton[] b = new JButton[buttons.length];
 
+        Color color= new Color(222,251,222);
+        Color color2= new Color(255,127,80);
+        Color color3= new Color(255,255,224);
         for (int i = 0; i < buttons.length; i++) {
             b[i] = new JButton(buttons[i]);
             p2.add(b[i]);
 
             final String buttonText = buttons[i];
             b[i].addActionListener(e -> handleButtonClick(buttonText));
+
+            b[i].setBackground(color);
         }
+        for (int i = 8; i < 20; i++){
+            if (i % 4 != 3) {
+                b[i].setForeground(color2);
+            }
+        }
+        b[21].setForeground(color2);
+        p2.setBackground(color3);
 
         add(p2, BorderLayout.CENTER);
         this.setVisible(true);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
+
 
     private void handleButtonClick(String buttonText) {
         String currentText = result.getText();
@@ -255,6 +273,7 @@ public class test extends JFrame {
             return Double.NaN; // 오류 발생 시 NaN 반환
         }
     }
+
 
     private boolean isOperator(String token) {
         return token.equals("+") || token.equals("-") || token.equals("*") || token.equals("/") || token.equals("%");
