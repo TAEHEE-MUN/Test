@@ -71,7 +71,7 @@ public class test extends JFrame {
                 toggleLastNumberSign();
                 break;
             case "CE":
-                result.setText(""); // 입력 필드 지우기
+                result_process.setText("");
                 break;
             case "C":
                 result.setText(""); // 모든 필드 초기화
@@ -90,9 +90,35 @@ public class test extends JFrame {
                     result_show.setText("Error"); // 오류 메시지 표시
                 } else {
                     result_show.setText(String.valueOf(resultValue));
-                    result_process.setText(expression + " = " + resultValue);
+                    result_process.setText(expression);
                 }
                 result.setText(""); // 입력 필드 비우기
+                break;
+            case "1/x":
+                if (!currentText.isEmpty()) {
+                    double value = 1.0 / Double.parseDouble(currentText);
+                    result_show.setText(String.valueOf(value));
+                    result_process.setText("1/" + currentText);
+                    result.setText(""); // 입력 필드 비우기
+                }
+                break;
+            case "x²":
+                if (!currentText.isEmpty()) {
+
+                    result_process.setText(result_process.getText() + "(" + currentText + "²)");
+                    result_show.setText("");
+                    result.setText(""); // 입력 필드 비우기
+                }
+                break;
+            case "√x":
+                if (!currentText.isEmpty()) {
+
+                    double sqrtValue = Math.sqrt(Double.parseDouble(currentText));
+                    result_show.setText("");
+                    result_process.setText(result_process.getText() + sqrtValue);
+                    result.setText(""); // 입력 필드 비우기
+
+                }
                 break;
             default:
                 if (isOperator(buttonText) && isOperator(currentText)) {
@@ -104,6 +130,9 @@ public class test extends JFrame {
                     result_process.setText(result_process.getText() + currentText + buttonText);
                     result_show.setText(String.valueOf(resultValue2));
                     result.setText("");
+                    if (isOperator("%")) {
+                        result_show.setText("");
+                    }
                 } else {
                     result.setText(currentText + buttonText);
                 }
@@ -130,23 +159,38 @@ public class test extends JFrame {
             List<String> operators = new ArrayList<>();
 
             StringBuilder currentNumber = new StringBuilder();
-            boolean expectNumber = true;  // 다음에 숫자가 나와야 하는지 여부
+            boolean expectNumber = true;  // 다음 토큰은 숫자여야 함
 
             for (int i = 0; i < expression.length(); i++) {
                 char c = expression.charAt(i);
 
                 if (c == '-' && expectNumber) {
-                    // 숫자 앞의 '-' 기호를 음수로 처리
                     currentNumber.append(c);
                     expectNumber = false;
                 } else if (Character.isDigit(c) || c == '.') {
                     currentNumber.append(c);
                     expectNumber = false;
+                } else if (c == '²') {
+                    // 제곱 처리
+                    double base = Double.parseDouble(currentNumber.toString());
+                    values.add(Math.pow(base, 2));
+                    currentNumber.setLength(0); // 현재 숫자 초기화
+                    expectNumber = true; // 다음에 숫자를 기대
+                } else if (c == '√') {
+                    if (currentNumber.length() > 0) {
+                        double base = Double.parseDouble(currentNumber.toString());
+                        values.add(Math.sqrt(base)); // 현재 숫자의 제곱근을 계산
+                        result_process.setText(result_process.getText() + "√" + base); // 과정에 추가
+                        currentNumber.setLength(0); // 현재 숫자 초기화
+                    }
+                    expectNumber = true; // 다음에 숫자를 기대
                 } else if (isOperator(String.valueOf(c))) {
-                    values.add(Double.parseDouble(currentNumber.toString()));
+                    if (currentNumber.length() > 0) {
+                        values.add(Double.parseDouble(currentNumber.toString()));
+                        currentNumber.setLength(0);  // 현재 숫자 초기화
+                    }
                     operators.add(String.valueOf(c));
-                    currentNumber.setLength(0);  // 현재 숫자 초기화
-                    expectNumber = true;  // 다음에 숫자가 오기를 기대
+                    expectNumber = true;  // 다음에 숫자를 기대
                 }
             }
 
@@ -158,9 +202,10 @@ public class test extends JFrame {
                 return Double.NaN;
             }
 
+            // 곱셈과 나눗셈을 먼저 처리합니다.
             for (int i = 0; i < operators.size(); i++) {
                 String operator = operators.get(i);
-                if (operator.equals("*") || operator.equals("/")) {
+                if (operator.equals("*") || operator.equals("/") || operator.equals("%")) {
                     double leftValue = values.get(i);
                     double rightValue = values.get(i + 1);
                     double result = 0;
@@ -173,18 +218,22 @@ public class test extends JFrame {
                             if (rightValue != 0) {
                                 result = leftValue / rightValue;
                             } else {
-                                return Double.NaN;
+                                return Double.NaN; // 0으로 나누는 경우
                             }
+                            break;
+                        case "%":
+                            result = leftValue % rightValue; // 나머지 연산
                             break;
                     }
 
                     values.set(i, result);
                     values.remove(i + 1);
                     operators.remove(i);
-                    i--;
+                    i--; // 제거 후 인덱스 조정
                 }
             }
 
+            // 이제 덧셈과 뺄셈을 처리합니다.
             double finalResult = values.get(0);
             for (int i = 0; i < operators.size(); i++) {
                 String operator = operators.get(i);
@@ -199,9 +248,11 @@ public class test extends JFrame {
                         break;
                 }
             }
+
             return finalResult;
+
         } catch (Exception e) {
-            return Double.NaN;
+            return Double.NaN; // 오류 발생 시 NaN 반환
         }
     }
 
@@ -210,6 +261,6 @@ public class test extends JFrame {
     }
 
     public static void main(String[] argv) {
-        new test(); // 계산기 GUI 실행
+        new test();
     }
 }
